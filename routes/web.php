@@ -1,15 +1,20 @@
 <?php
 
+use App\Http\Controllers\LinkController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('landing_page');
 });
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+Route::get('/dashboard', [LinkController::class, 'index'])
+->middleware(['auth', 'verified'])->name('dashboard');
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::post('/dashboard/links', [LinkController::class, 'store'])->name('links.store');
+    Route::patch('/dashboard/links/{id}', [LinkController::class, 'update'])->name('links.update');
+    Route::delete('/dashboard/links/{id}', [LinkController::class, 'destroy'])->name('links.destroy');
+});
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
