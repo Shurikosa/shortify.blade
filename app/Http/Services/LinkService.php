@@ -49,4 +49,9 @@ class LinkService
         return Link::query()->where('url', $url)->where('user_id', Auth::id())->exists();
     }
 
+    public function checkShortLink($shortLink): bool
+    {
+        return !$shortLink || ($shortLink->valid_until && $shortLink->valid_until->isPast());
+    }
+
 }

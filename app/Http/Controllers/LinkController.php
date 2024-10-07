@@ -46,17 +46,25 @@ class LinkController extends Controller
     {
         $link = Link::query()->findOrFail($id);
         $link->valid_until = now()->addMinutes(1);
-        return redirect()->back();
+        $link->save();
+        return redirect()->back()->with('success', 'Link updated successfully');
     }
 
     public function destroy(int $id)
     {
         $link = Link::query()->findOrFail($id);
         $link->delete();
-        return redirect()->back();
+        return redirect()->back()->with('success', 'Link deleted successfully');
     }
 
-    public function redirect(){
+    public function redirect($short_link)
+    {
+        $link = Link::where('short_link', $short_link)->firstOrFail();
+        if($this->linkService->checkShortLink($link)){
+            return redirect()->route('dashboard')->with('error', 'This link is invalid or expired.');
+        }
+        $link->increment('click_count');
+        return redirect()->away($link->url);
 
     }
 }

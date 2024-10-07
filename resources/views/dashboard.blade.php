@@ -48,16 +48,32 @@
                                 <th class="px-4 py-2 border">Created At</th>
                                 <th class="px-4 py-2 border">Valid To</th>
                                 <th class="px-4 py-2 border">Click Count</th>
+                                <th class="px-4 py-2 border">Actions</th>
                             </tr>
                             </thead>
                             <tbody>
                             @foreach($links as $link)
                                 <tr>
                                     <td class="px-4 py-2 border"><a href="{{ $link->url }}" target="_blank" class="text-blue-600 hover:underline">{{ $link->url }}</a></td>
-                                    <td class="px-4 py-2 border"><a href="{{ $link->url }}" target="_blank" class="text-blue-600 hover:underline">{{ $link->short_link }}</a></td>
+                                    <td class="px-4 py-2 border"><a href="{{ route('links.redirect', ['short_link' => $link->short_link]) }}" target="_blank" class="text-blue-600 hover:underline">{{ $link->short_link }}</a></td>
                                     <td class="px-4 py-2 border">{{ $link->created_at->format('Y-m-d H:i:s') }}</td>
                                     <td class="px-4 py-2 border">{{ $link->valid_until ? $link->valid_until->format('Y-m-d H:i:s') : 'No expiration' }}</td>
                                     <td class="px-4 py-2 border">{{ $link->click_count }}</td>
+                                    <td class="px-4 py-2 border">
+                                        <div class="flex space-x-2">
+                                            <!-- Кнопка для оновлення -->
+                                            <form action="{{ route('links.update', $link->id) }}" method="POST" >
+                                                @csrf
+                                                @method('PATCH')
+                                                <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-500">Update</button>
+                                            </form>
+                                            <!-- Кнопка для видалення -->
+                                            <form action="{{ route('links.destroy', $link->id) }}" method="POST">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-400">Delete</button>
+                                            </form>
+                                        </div>
                                 </tr>
                             @endforeach
                             </tbody>

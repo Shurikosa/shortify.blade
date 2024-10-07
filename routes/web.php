@@ -10,10 +10,12 @@ Route::get('/', function () {
 
 Route::get('/dashboard', [LinkController::class, 'index'])
 ->middleware(['auth', 'verified'])->name('dashboard');
+
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/dashboard/links', [LinkController::class, 'store'])->name('links.store');
     Route::patch('/dashboard/links/{id}', [LinkController::class, 'update'])->name('links.update');
     Route::delete('/dashboard/links/{id}', [LinkController::class, 'destroy'])->name('links.destroy');
+    //Route::get('/{short_link}', [LinkController::class, 'redirect'])->name('links.redirect');
 });
 
 Route::middleware('auth')->group(function () {
