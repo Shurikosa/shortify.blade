@@ -42,18 +42,15 @@ class LinkController extends Controller
 
     }
 
-    public function update(Request $request , int $id)
+    public function update(int $id)
     {
-        $link = Link::query()->findOrFail($id);
-        $link->valid_until = now()->addMinutes(1);
-        $link->save();
+        $this->linkService->updateLink($id);
         return redirect()->back()->with('success', 'Link updated successfully');
     }
 
     public function destroy(int $id)
     {
-        $link = Link::query()->findOrFail($id);
-        $link->delete();
+        $this->linkService->deleteLink($id);
         return redirect()->back()->with('success', 'Link deleted successfully');
     }
 

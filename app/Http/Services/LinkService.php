@@ -12,12 +12,6 @@ use Illuminate\Support\Facades\Http;
 
 class LinkService
 {
-//    protected ShortLinkGenerator $shortLinkGenerator;
-//
-//    public function __construct(ShortLinkGenerator $shortLinkGenerator)
-//    {
-//        $this->shortLinkGenerator = $shortLinkGenerator;
-//    }
     public function getAllLinks(): Collection
     {
         return Link::query()->where('user_id', Auth::id())->get();
@@ -32,6 +26,19 @@ class LinkService
         $link->click_count = 0;
         $link->valid_until = now()->addMinutes(1);
         $link->save();
+    }
+
+    public function updateLink(int $id): void
+    {
+        $link = Link::query()->findOrFail($id);
+        $link->valid_until = now()->addMinutes(1);
+        $link->save();
+    }
+
+    public function deleteLink(int $id): void
+    {
+        $link = Link::query()->findOrFail($id);
+        $link->delete();
     }
 
     public function isUrlAccessible(string $url): bool
