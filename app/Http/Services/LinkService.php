@@ -30,9 +30,13 @@ class LinkService
 
     public function updateLink(int $id): void
     {
-        $link = Link::query()->findOrFail($id);
-        $link->valid_until = now()->addMinutes(1);
+        $link = $this->getLinkById($id);
+        $link->valid_until = now()->addMinutes(5);
         $link->save();
+    }
+    public function getLinkById(int $id): Link
+    {
+        return Link::query()->findOrFail($id);
     }
 
     public function deleteLink(int $id): void
@@ -40,6 +44,8 @@ class LinkService
         $link = Link::query()->findOrFail($id);
         $link->delete();
     }
+
+
 
     public function isUrlAccessible(string $url): bool
     {

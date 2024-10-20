@@ -10,13 +10,13 @@
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900">
                     <!-- Форма для створення нового посилання -->
-                    <form action="{{ route('links.store')}}" method="POST" class="mb-6">
+                    <form id="shortenForm" class="mb-6">
                         @csrf
                         <div class="mb-4">
                             <label for="url" class="block text-sm font-medium text-gray-700 mb-2">Put your URL here</label>
                             <div class="flex">
                                 <input type="text" id="url" name="url" required class="w-full px-4 py-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
-                                <button type="submit" class="px-4 py-2 text-white rounded-r-md "style="background-color: #4768c9;"
+                                <button type="button" id="shortenButton" class="px-4 py-2 text-white rounded-r-md" style="background-color: #4768c9;"
                                         onmouseover="this.style.backgroundColor='#778fd9'"
                                         onmouseout="this.style.backgroundColor='#4768c9'" >Shorten</button>
                             </div>
@@ -24,17 +24,19 @@
                     </form>
 
                     <!-- Повідомлення про успіх чи помилку -->
-                    @if (session('success'))
-                        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4">
-                            <span class="block sm:inline">{{ session('success') }}</span>
-                        </div>
-                    @endif
+                    <div id="message-container">
+                        @if (session('success'))
+                            <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4">
+                                <span class="block sm:inline">{{ session('success') }}</span>
+                            </div>
+                        @endif
 
-                    @if (session('error'))
-                        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4">
-                            <span class="block sm:inline">{{ session('error') }}</span>
-                        </div>
-                    @endif
+                        @if (session('error'))
+                            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4">
+                                <span class="block sm:inline">{{ session('error') }}</span>
+                            </div>
+                        @endif
+                    </div>
 
                     <!-- Відображення таблиці з посиланнями -->
                     @if($links->isEmpty())
@@ -56,7 +58,13 @@
                             <tbody>
                             @foreach($links as $link)
                                 <tr>
-                                    <td class="px-4 py-2 border"><a href="{{ $link->url }}" target="_blank" class="text-blue-600 hover:underline">{{ $link->url }}</a></td>
+                                    <td class="px-4 py-2 border">
+                                        <a href="{{ $link->url }}" target="_blank"
+                                            class="action-button text-blue-600 hover:underline"
+                                            data-action="open" data-link-id="{{$link->id}}">
+                                            {{ $link->url }}
+                                        </a>
+                                    </td>
                                     <td class="px-4 py-2 border"><a href="{{ route('links.redirect', ['short_link' => $link->short_link]) }}" target="_blank" class="text-blue-600 hover:underline">{{ $link->short_link }}</a></td>
                                     <td class="px-4 py-2 border">{{ $link->created_at->format('Y-m-d H:i:s') }}</td>
                                     <td class="px-4 py-2 border">{{ $link->valid_until ? $link->valid_until->format('Y-m-d H:i:s') : 'No expiration' }}</td>
@@ -64,18 +72,16 @@
                                     <td class="px-4 py-2 border">
                                         <div class="flex space-x-2">
                                             <!-- Кнопка для оновлення -->
-                                            <form action="{{ route('links.update', $link->id) }}" method="POST" >
+                                            <form  id="updateForm" data-link-id="{{ $link->id }}" >
                                                 @csrf
-                                                @method('PATCH')
-                                                <button type="submit" class="px-4 py-2 text-white rounded" style="background-color: #4768c9;"
+                                                <button type="button" id="updateButton" class="px-4 py-2 text-white rounded" style="background-color: #4768c9;"
                                                         onmouseover="this.style.backgroundColor='#778fd9'"
                                                         onmouseout="this.style.backgroundColor='#4768c9'">Update</button>
                                             </form>
                                             <!-- Кнопка для видалення -->
-                                            <form action="{{ route('links.destroy', $link->id) }}" method="POST">
+                                            <form  id="deleteForm" data-link-id="{{ $link->id }}">
                                                 @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="px-4 py-2 bg-red-400 text-white rounded hover:bg-red-300">Delete</button>
+                                                <button type="button" id="deleteButton" class="px-4 py-2 bg-red-400 text-white rounded hover:bg-red-300">Delete</button>
                                             </form>
                                         </div>
                                 </tr>
@@ -87,4 +93,7 @@
             </div>
         </div>
     </div>
+    <script @vite(['resources/js/fetch.js'])></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
 </x-app-layout>

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Services\LinkService;
 use App\Models\Link;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -27,31 +28,40 @@ class LinkController extends Controller
             'url' => 'required|url',
         ]);
 
-        if(!$this->linkService->isUrlAccessible($request->url)){
-            return redirect()->back()->with('error', 'The provided URL is not accessible.
-                                            Please check the URL and try again.');
+        try {
+            if(!$this->linkService->isUrlAccessible($request->url)){
+                return response()->json(['message' => 'The provided URL is not accessible.
+                                            Please check the URL and try again.']);
+            }
+
+            if($this->linkService->isUrlAlreadyExist($request->url)) {
+                return response()->json(['message' =>'The provided URL is already exist.
+                                            Please check the URL and try again.']);
+            }
+
+            $this->linkService->addLink($request);
+            return response()->json(['message' => 'Link added successfully']);
+        } catch (Exception $e) {
+            return response()->json(['message' => 'Failed to add link'], 500);
         }
 
-        if($this->linkService->isUrlAlreadyExist($request->url)) {
-        return redirect()->back()->with('error', 'The provided URL is already exist.
-                                            Please check the URL and try again.');
-        }
-
-        $this->linkService->addLink($request);
-        return redirect()->back()->with('success', 'Link added successfully');
 
     }
 
     public function update(int $id)
     {
-        $this->linkService->updateLink($id);
-        return redirect()->back()->with('success', 'Link updated successfully');
+        try {
+            $this->linkService->updateLink($id);
+            return response()->json(['message' => 'Link updated successfully']);
+        } catch (Exception $e) {
+            return response()->json(['message' => 'Failed to update link'], 500);
+        }
     }
 
     public function destroy(int $id)
     {
         $this->linkService->deleteLink($id);
-        return redirect()->back()->with('success', 'Link deleted successfully');
+        return response()->json(['message' => 'Link deleted successfully']);
     }
 
     public function redirect($short_link)
