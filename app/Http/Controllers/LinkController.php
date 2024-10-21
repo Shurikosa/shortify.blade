@@ -7,6 +7,7 @@ use App\Models\Link;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use function Laravel\Prompts\error;
 
 class LinkController extends Controller
 {
@@ -24,44 +25,59 @@ class LinkController extends Controller
     }
     public function store(Request $request)
     {
-        $request->validate([
-            'url' => 'required|url',
-        ]);
-
         try {
+            if(!$request->filled('url')) {
+                return response()->json([
+                    'id' => 'error',
+                    'message' => 'Url field cannot be empty.']);
+            }
             if(!$this->linkService->isUrlAccessible($request->url)){
-                return response()->json(['message' => 'The provided URL is not accessible.
-                                            Please check the URL and try again.']);
+                return response()->json([
+                    'id' => 'error',
+                    'message' => 'The provided URL is not accessible.
+                     Please check the URL and try again.',500]);
             }
 
             if($this->linkService->isUrlAlreadyExist($request->url)) {
-                return response()->json(['message' =>'The provided URL is already exist.
-                                            Please check the URL and try again.']);
+                return response()->json([
+                    'id' => 'error',
+                    'message' =>'The provided URL is already exist.
+                     Please check the URL and try again.',500]);
             }
 
             $this->linkService->addLink($request);
-            return response()->json(['message' => 'Link added successfully']);
+            return response()->json([
+                'id' => 'success',
+                'message' => 'Link added successfully']);
         } catch (Exception $e) {
-            return response()->json(['message' => 'Failed to add link'], 500);
+            return response()->json([
+                'id' => 'error',
+                'message' => 'Failed to add link. Please try again later.',
+            ], 500);
         }
-
-
     }
 
     public function update(int $id)
     {
         try {
             $this->linkService->updateLink($id);
-            return response()->json(['message' => 'Link updated successfully']);
+            return response()->json([
+                'id' => 'success',
+                'message' => 'Link updated successfully',
+                'valid_until' => $this->linkService->getLinkById($id)->valid_until]);
         } catch (Exception $e) {
-            return response()->json(['message' => 'Failed to update link'], 500);
+            return response()->json([
+                'id' => 'error',
+                'message' => 'Failed to update link'], 500);
         }
     }
 
     public function destroy(int $id)
     {
         $this->linkService->deleteLink($id);
-        return response()->json(['message' => 'Link deleted successfully']);
+        return response()->json([
+            'id' => 'success',
+            'message' => 'Link deleted successfully']);
     }
 
     public function redirect($short_link)

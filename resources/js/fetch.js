@@ -7,21 +7,21 @@ document.addEventListener('click', async function (e) {
     const linkId = form?.getAttribute('data-link-id');
 
     const createLink = 'dashboard/links/store';
-    const updateLink = 'dashboard/links/update/${linkId}';
-    const deleteLink = 'dashboard/links/destroy/${linkId}';
+    const updateLink = `dashboard/links/update/${linkId}`;
+    const deleteLink = `dashboard/links/destroy/${linkId}`;
 
-    const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+
     switch (buttonId) {
         case 'shortenButton':
             const url = document.getElementById('url').value;
-            await sendAjaxRequest(createLink, 'POST', {url}, csrfToken);
+            await sendAjaxRequest(createLink, 'POST', {url});
             break;
         case 'updateButton':
-            await sendAjaxRequest(updateLink, 'POST', csrfToken);
+            await sendAjaxRequest(updateLink, 'POST');
             break;
         case 'deleteButton':
             if(confirm('Are you sure you want to delete this link?')) {
-                await sendAjaxRequest(deleteLink, 'DELETE', csrfToken);
+                await sendAjaxRequest(deleteLink, 'DELETE');
             }
             break;
 
@@ -34,6 +34,7 @@ document.addEventListener('click', async function (e) {
 function updateMessageContainer(type, message) {
     const messageContainer = document.getElementById('message-container');
     let alertClass;
+    console.log(type,message);
     if (type === 'success') {
         alertClass = 'bg-green-100 border border-green-400 text-green-700';
     } else {
@@ -48,7 +49,8 @@ function updateMessageContainer(type, message) {
 
 
 
-async function sendAjaxRequest(url, method, data, csrfToken) {
+async function sendAjaxRequest(url, method, data = {}) {
+    const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
     try {
         const response = await fetch(url, {
             method: method,
@@ -62,10 +64,12 @@ async function sendAjaxRequest(url, method, data, csrfToken) {
 
         const result = await response.json();
         console.log(result);
+        console.log(result.message)
 
-        if (response.ok) {
+
+        if (response.ok && result.id === 'success') {
             updateMessageContainer('success', result.message);
-        } else {
+        } else if (response.ok && result.id === 'error') {
             updateMessageContainer('error', result.message);
         }
     }catch (error) {
