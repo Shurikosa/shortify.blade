@@ -10,14 +10,13 @@ document.addEventListener('click', async function (e) {
     const updateLink = `dashboard/links/update/${linkId}`;
     const deleteLink = `dashboard/links/destroy/${linkId}`;
 
-
     switch (buttonId) {
         case 'shortenButton':
             const url = document.getElementById('url').value;
             await sendAjaxRequest(createLink, 'POST', {url});
             break;
         case 'updateButton':
-            await sendAjaxRequest(updateLink, 'POST');
+            await sendAjaxRequest(updateLink, 'POST', {linkId});
             break;
         case 'deleteButton':
             if(confirm('Are you sure you want to delete this link?')) {
@@ -47,6 +46,17 @@ function updateMessageContainer(type, message) {
     `;
 }
 
+function updateValidUntilField(linkId, validUntil) {
+    const validUntilCell = document.querySelector(
+        `tr[data-link-id="${linkId}"] td[data-field="valid_until"]`);
+    console.log(validUntilCell)
+    if(validUntilCell){
+        validUntilCell.textContent = validUntil;
+    }else {
+        console.warn('No valid until cell found for link', linkId);
+    }
+}
+
 
 
 async function sendAjaxRequest(url, method, data = {}) {
@@ -65,9 +75,17 @@ async function sendAjaxRequest(url, method, data = {}) {
         const result = await response.json();
         console.log(result);
         console.log(result.message)
+        console.log(data.linkId)
+        console.log(response.ok)
+        console.log(result.id)
+        console.log(result.valid_until)
+
 
 
         if (response.ok && result.id === 'success') {
+            if(result.valid_until) {
+                updateValidUntilField(data.linkId, result.valid_until);
+            }
             updateMessageContainer('success', result.message);
         } else if (response.ok && result.id === 'error') {
             updateMessageContainer('error', result.message);

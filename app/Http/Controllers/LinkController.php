@@ -61,10 +61,12 @@ class LinkController extends Controller
     {
         try {
             $this->linkService->updateLink($id);
+            $valid_until = $this->linkService->getLinkById($id)->valid_until;
             return response()->json([
                 'id' => 'success',
                 'message' => 'Link updated successfully',
-                'valid_until' => $this->linkService->getLinkById($id)->valid_until]);
+                'valid_until' => $valid_until->format('Y.m.d H:i'),
+                ]);
         } catch (Exception $e) {
             return response()->json([
                 'id' => 'error',

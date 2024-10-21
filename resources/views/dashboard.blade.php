@@ -59,7 +59,7 @@
                                 </thead>
                                 <tbody>
                                 @foreach($links as $link)
-                                    <tr>
+                                    <tr data-link-id="{{ $link->id }}">
                                         <td class="px-4 py-2 border truncate max-w-xs">
                                             <a href="{{ $link->url }}" target="_blank" class="text-blue-600 hover:underline">
                                                 {{ $link->url }}
@@ -72,7 +72,8 @@
                                             </a>
                                         </td>
                                         <td class="px-4 py-2 border">{{ $link->created_at->format('Y.m.d H:i') }}</td>
-                                        <td class="px-4 py-2 border">{{ $link->valid_until ? $link->valid_until->format('Y.m.d H:i') : 'No expiration' }}</td>
+                                        <td class="px-4 py-2 border" data-field="valid_until">
+                                            {{ $link->valid_until ? $link->valid_until->format('Y.m.d H:i') : 'No expiration' }}</td>
                                         <td class="px-4 py-2 border">{{ $link->click_count }}</td>
                                         <td class="px-4 py-2 border">
                                             <div class="flex space-x-2">
