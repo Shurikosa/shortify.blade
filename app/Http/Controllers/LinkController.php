@@ -6,8 +6,7 @@ use App\Http\Services\LinkService;
 use App\Models\Link;
 use Exception;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use function Laravel\Prompts\error;
+
 
 class LinkController extends Controller
 {

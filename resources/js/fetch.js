@@ -23,10 +23,8 @@ document.addEventListener('click', async function (e) {
                 await sendAjaxRequest(deleteLink, 'DELETE');
             }
             break;
-
         default:
             console.warn('Unknown button clicked', buttonId);
-
     }
 });
 
@@ -56,8 +54,6 @@ function updateValidUntilField(linkId, validUntil) {
         console.warn('No valid until cell found for link', linkId);
     }
 }
-
-
 
 async function sendAjaxRequest(url, method, data = {}) {
     const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
